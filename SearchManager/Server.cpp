@@ -110,6 +110,10 @@ void server_handle_receive(SOCKET clientsock, std::string& buffer)
 	{
 		gamespy_valid(clientsock, buffer.substr(found + 1));
 	}
+	else if (req.compare("nicks") == 0)
+	{
+		gamespy_nicks(clientsock, buffer.substr(found + 1));
+	}
 	else
 	{
 #ifdef _DEBUG

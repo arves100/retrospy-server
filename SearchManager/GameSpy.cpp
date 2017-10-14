@@ -17,7 +17,7 @@ void gamespy_valid(SOCKET clientsock, std::string& buffer)
 			if (email[0] == 0 || partnerid[0] == 0 || gamename[0] == 0)
 			{
 #ifdef _DEBUG
-				printf("= Error: this VALID request is invalid!\n");
+				printf("= Error: valid request is invalid!\n");
 #endif
 				return;
 			}

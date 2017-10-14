@@ -42,7 +42,7 @@ void server_start()
 		}
 
 #ifdef _DEBUG
-		printf("= Accpted Socket\n");
+		printf("= Accpeted Socket\n");
 #endif
 
 		if (!socket_recv(clientsock, buffer, &buflen))

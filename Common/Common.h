@@ -1,9 +1,11 @@
 #ifndef _RSS_COMMON_COMMON_H_
 #define _RSS_COMMON_COMMON_H_
 
-#define COMMONSDK_VERSION "0.1.1"
+#define COMMONSDK_VERSION "0.1.2"
 
 /*
+	Version 0.1.2
+		Added SQLite3
 	Version 0.1.1
 		Added socket_connect
 		Redefined Socket API
@@ -29,5 +31,6 @@
 
 #define GAMESPY_BUFLEN 1024
 #define GAMESPY_GAMENAME_MAX 64
+#define QUERY_MAX_LEN 1024
 
 #endif

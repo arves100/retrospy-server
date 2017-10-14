@@ -28,13 +28,13 @@ void server_start()
 	while (server_running)
 	{
 		SOCKET clientsock = INVALID_SOCKET;
-		char *buffer;
+		char buffer[GAMESPY_BUFLEN] = { 0 };
 		int buflen = 0;
 
 		if (!socket_accept(listensock, &clientsock))
 			continue;
 
-		buffer = socket_recv(clientsock, &buflen);
+		socket_recv(clientsock, buffer, &buflen);
 
 		if (buflen > 0)
 			server_handle_receive(clientsock, std::string(buffer));

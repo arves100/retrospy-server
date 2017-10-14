@@ -2,6 +2,7 @@
 #define _RSS_GPSP_STDAFX_H_
 
 #include "../Common/Common.h"
+#include "../Common/Socket.h"
 
 #include <string>
 

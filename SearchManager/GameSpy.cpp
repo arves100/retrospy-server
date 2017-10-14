@@ -14,8 +14,13 @@ void gamespy_valid(SOCKET clientsock, std::string& buffer)
 		find = buffer.find("\\");
 		if (find == std::string::npos)
 		{
-			printf("Error: this VALID request is invalid!\n");
-			return;
+			if (email[0] == 0 || partnerid[0] == 0 || gamename[0] == 0)
+			{
+				printf("Error: this VALID request is invalid!\n");
+				return;
+			}
+			else
+				break;
 		}
 
 		check = buffer.substr(0, find);

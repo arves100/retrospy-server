@@ -70,7 +70,7 @@ void gamespy_valid(SOCKET clientsock, std::string& buffer)
 	}
 
 #ifdef _DEBUG
-	printf("= Successfully received:\n\tEmail: %s\n\tPartnerID: %s\n\tGameName: %s\n\t", email, partnerid, gamename);
+	printf("= Successfully received valid request:\n\tEmail: %s\n\tPartnerID: %s\n\tGameName: %s\n", email, partnerid, gamename);
 #endif
 
 	socket_send(clientsock, "\\vr\\1\\final\\", 13); // Send OK!

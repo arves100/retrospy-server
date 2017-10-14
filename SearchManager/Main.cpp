@@ -2,15 +2,23 @@
 #include "GameSpy.h"
 
 int server_running = FALSE;
+SOCKET listensock = INVALID_SOCKET;
 
 void console_pause();
-void server_handle_receive(std::string& buffer);
+void server_handle_receive(SOCKET clientsock, std::string& buffer);
 
 int main(int argc, char **argv)
 {
 	printf("RetroSpy Search Manager Server v%s (Common SDK v%s)\n\n", GPSP_VERSION, COMMONSDK_VERSION);
 	printf("Creating Network...\n");
-	if (!socket_init(GPSP_PORT))
+
+	if (!socket_init())
+	{
+		console_pause();
+		return 1;
+	}
+
+	if (!socket_bind(GPSP_PORT, &listensock))
 	{
 		console_pause();
 		return 1;
@@ -21,17 +29,24 @@ int main(int argc, char **argv)
 
 	while (server_running)
 	{
+		SOCKET clientsock = INVALID_SOCKET;
 		char *buffer;
 		int buflen = 0;
 
-		if (!socket_accept())
+		if (!socket_accept(listensock, &clientsock))
 			continue;
 
-		buffer = socket_recv(&buflen);
+		buffer = socket_recv(clientsock, &buflen);
 
 		if (buflen > 0)
-			server_handle_receive(std::string(buffer));
+			server_handle_receive(clientsock, std::string(buffer));
+
+		shutdown(clientsock, SB_BOTH);
+		closesocket(clientsock);
 	}
+
+	shutdown(listensock, SB_BOTH);
+	closesocket(listensock);
 
 	socket_destroy();
 	console_pause();
@@ -50,7 +65,7 @@ void console_pause()
 #endif
 }
 
-void server_handle_receive(std::string& buffer)
+void server_handle_receive(SOCKET clientsock, std::string& buffer)
 {
 	size_t found = 0;
 	std::string req = "";
@@ -78,7 +93,7 @@ void server_handle_receive(std::string& buffer)
 
 	if (req.compare("valid") == 0)
 	{
-		gamespy_valid(buffer.substr(found + 1));
+		gamespy_valid(clientsock, buffer.substr(found + 1));
 	}
 	else
 	{

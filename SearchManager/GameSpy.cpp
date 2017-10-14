@@ -1,38 +1,7 @@
 #include "StdAfx.h"
 #include "GameSpy.h"
 
-char *get_from_slash(char *buffer, char *dst, size_t dst_size)
-{
-	char *find = NULL;
-	static char *rtn = NULL;
-
-	if (buffer == NULL)
-		return NULL;
-	if (dst == NULL)
-		return NULL;
-	if (dst_size <= 0)
-		return NULL;
-
-	find = strchr(buffer, '\\');
-
-	if (find == NULL)
-		return NULL;
-
-	if (rtn)
-		free(rtn);
-
-	rtn = (char *)malloc(strlen(find) * sizeof(char));
-	if (!rtn)
-		return NULL;
-
-	strncpy_s(dst, dst_size, buffer, find - buffer);
-
-	rtn = buffer + (find - buffer) + 1;
-
-	return rtn;
-}
-
-void gamespy_valid(std::string& buffer)
+void gamespy_valid(SOCKET clientsock, std::string& buffer)
 {
 	char email[GP_EMAIL_LEN] = { 0 };
 	char partnerid[sizeof(int)] = { 0 };
@@ -89,5 +58,5 @@ void gamespy_valid(std::string& buffer)
 
 	printf("=> GOT EMAIL: %s\n=> GOT PARTNERID: %s\n=> GOT GAMENAME: %s\n", email, partnerid, gamename);
 
-	socket_send("\\vr\\1\\final\\", 13); // Send OK!
+	socket_send(clientsock, "\\vr\\1\\final\\", 13); // Send OK!
 }

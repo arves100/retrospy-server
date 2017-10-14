@@ -134,7 +134,7 @@ int socket_recv(SOCKET sock, char* dst, int *dstlen)
 	if (*dstlen > 0)
 	{
 		printf("socket_recv: received %d bytes\n", *dstlen);
-		return TRUE;
+		return 1;
 	}
 
 	if (*dstlen == 0)
@@ -142,7 +142,7 @@ int socket_recv(SOCKET sock, char* dst, int *dstlen)
 	else
 		printf("Error in socket_recv: recv error: %d\n", WSAGetLastError());
 
-	return FALSE;
+	return 0;
 }
 
 int socket_send(SOCKET sock, char *input, int length)
@@ -152,9 +152,9 @@ int socket_send(SOCKET sock, char *input, int length)
 	if (iResult == SOCKET_ERROR)
 	{
 		printf("Error in socket_send: send error: %d\n", WSAGetLastError());
-		return 1;
+		return 0;
 	}
 
 	printf("socket_send: sended %d bytes\n", length);
-	return 0;
+	return 1;
 }

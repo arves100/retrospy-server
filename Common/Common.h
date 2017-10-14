@@ -1,7 +1,7 @@
 #ifndef _RSS_COMMON_COMMON_H_
 #define _RSS_COMMON_COMMON_H_
 
-#define COMMONSDK_VERSION "0.1"
+#define COMMONSDK_VERSION "0.1.1"
 
 /*
 	Version 0.1.1

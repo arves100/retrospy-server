@@ -34,7 +34,8 @@ void server_start()
 		if (!socket_accept(listensock, &clientsock))
 			continue;
 
-		socket_recv(clientsock, buffer, &buflen);
+		if (!socket_recv(clientsock, buffer, &buflen))
+			continue;
 
 		if (buflen > 0)
 			server_handle_receive(clientsock, std::string(buffer));

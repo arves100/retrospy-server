@@ -63,5 +63,6 @@ void gamespy_valid(SOCKET clientsock, std::string& buffer)
 
 	printf("=> GOT EMAIL: %s\n=> GOT PARTNERID: %s\n=> GOT GAMENAME: %s\n", email, partnerid, gamename);
 
+
 	socket_send(clientsock, "\\vr\\1\\final\\", 13); // Send OK!
 }

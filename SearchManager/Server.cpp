@@ -48,7 +48,7 @@ void server_start()
 	}
 
 	printf("Opening Database...\n");
-	if (!database_open("gamespy.db"))
+	if (!database_open(database_name))
 	{
 		printf("Error: Cannot open database \"gamespy.db\"\n");
 		socket_destroy();

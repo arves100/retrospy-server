@@ -28,4 +28,6 @@ extern void console_pause();
 #define GP_NICK_LEN                 31
 #define GP_UNIQUENICK_LEN           21
 
+static const char *database_name = "retrospy.db";
+
 #endif

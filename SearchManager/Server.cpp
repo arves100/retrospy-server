@@ -10,7 +10,7 @@ int server_init_database()
 	
 	if (!database_exec("SELECT id FROM users"))
 	{
-		sprintf_s(buffer, QUERY_MAX_LEN, "CREATE TABLE IF NOT EXISTS users(id INT NOT NULL AUTO_INCREMENT, email VARCHAR(%d) NOT NULL, password VARCHAR(%d) NOT NULL, PRIMARY KEY(id))", GP_EMAIL_LEN, GP_PASSWORDENC_LEN);
+		sprintf_s(buffer, QUERY_MAX_LEN, "CREATE TABLE IF NOT EXISTS users(id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, email VARCHAR(%d) NOT NULL, password VARCHAR(%d) NOT NULL)", GP_EMAIL_LEN, GP_PASSWORDENC_LEN);
 
 		if (!database_exec(buffer))
 			return 0;
@@ -19,7 +19,7 @@ int server_init_database()
 
 	if (!database_exec("SELECT id FROM nicks"))
 	{
-		sprintf_s(buffer, QUERY_MAX_LEN, "CREATE TABLE IF NOT EXISTS nicks(id INT NOT NULL AUTO_INCREMENT, acc_id INT NOT NULL, nickname VARCHAR(%d) NOT NULL, unique_nickname VARCHAR(%d) NOT NULL, PRIMARY KEY(id))", GP_NICK_LEN, GP_UNIQUENICK_LEN);
+		sprintf_s(buffer, QUERY_MAX_LEN, "CREATE TABLE IF NOT EXISTS nicks(id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, acc_id INTEGER NOT NULL, nickname VARCHAR(%d) NOT NULL, unique_nickname VARCHAR(%d) NOT NULL)", GP_NICK_LEN, GP_UNIQUENICK_LEN);
 
 		if (!database_exec(buffer))
 			return 0;
@@ -43,6 +43,7 @@ void server_start()
 	if (!socket_bind(GPSP_PORT, &listensock))
 	{
 		printf("Error: Cannot bind to 0.0.0.0:%d (Is the port busy?)\n", GPSP_PORT);
+		socket_destroy();
 		return;
 	}
 
@@ -50,12 +51,15 @@ void server_start()
 	if (!database_open("gamespy.db"))
 	{
 		printf("Error: Cannot open database \"gamespy.db\"\n");
+		socket_destroy();
 		return;
 	}
 
 	if (!server_init_database())
 	{
 		printf("Error: Cannot initalize database\n");
+		database_close();
+		socket_destroy();
 		return;
 	}
 
@@ -104,9 +108,9 @@ void server_start()
 	shutdown(listensock, SB_BOTH);
 	closesocket(listensock);
 
-	socket_destroy();
-
 	database_close();
+
+	socket_destroy();
 }
 
 void server_handle_receive(SOCKET clientsock, std::string& buffer)

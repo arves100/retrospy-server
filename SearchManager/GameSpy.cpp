@@ -16,7 +16,9 @@ void gamespy_valid(SOCKET clientsock, std::string& buffer)
 		{
 			if (email[0] == 0 || partnerid[0] == 0 || gamename[0] == 0)
 			{
-				printf("Error: this VALID request is invalid!\n");
+#ifdef _DEBUG
+				printf("= Error: this VALID request is invalid!\n");
+#endif
 				return;
 			}
 			else
@@ -31,7 +33,9 @@ void gamespy_valid(SOCKET clientsock, std::string& buffer)
 			find = buffer.find("\\");
 			if (find == std::string::npos)
 			{
-				printf("Error while getting Email!\n");
+#ifdef _DEBUG
+				printf("= Error: Cannot get Email!\n");
+#endif
 				return;
 			}
 
@@ -42,7 +46,9 @@ void gamespy_valid(SOCKET clientsock, std::string& buffer)
 			find = buffer.find("\\");
 			if (find == std::string::npos)
 			{
-				printf("Error while getting PartnerID!\n");
+#ifdef _DEBUG
+				printf("= Error: Cannot get PartnerID!\n");
+#endif
 				return;
 			}
 
@@ -53,7 +59,9 @@ void gamespy_valid(SOCKET clientsock, std::string& buffer)
 			find = buffer.find("\\");
 			if (find == std::string::npos)
 			{
-				printf("Error while getting GameName!\n");
+#ifdef _DEBUG
+				printf("= Error: Cannot get GameName!\n");
+#endif
 				return;
 			}
 
@@ -61,8 +69,9 @@ void gamespy_valid(SOCKET clientsock, std::string& buffer)
 		}
 	}
 
-	printf("=> GOT EMAIL: %s\n=> GOT PARTNERID: %s\n=> GOT GAMENAME: %s\n", email, partnerid, gamename);
-
+#ifdef _DEBUG
+	printf("= Successfully received:\n\tEmail: %s\n\tPartnerID: %s\n\tGameName: %s\n\t", email, partnerid, gamename);
+#endif
 
 	socket_send(clientsock, "\\vr\\1\\final\\", 13); // Send OK!
 }

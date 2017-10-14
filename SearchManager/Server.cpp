@@ -12,12 +12,14 @@ void server_start()
 
 	if (!socket_init())
 	{
+		printf("Error: Cannot initialize Socket\n");
 		console_pause();
 		return;
 	}
 
 	if (!socket_bind(GPSP_PORT, &listensock))
 	{
+		printf("Error: Cannot bind to 0.0.0.0:%d (Is the port busy?)\n", GPSP_PORT);
 		console_pause();
 		return;
 	}
@@ -32,13 +34,33 @@ void server_start()
 		int buflen = 0;
 
 		if (!socket_accept(listensock, &clientsock))
+		{
+#ifdef _DEBUG
+			printf("= Socket rejected by Server\n");
+#endif
 			continue;
+		}
+
+#ifdef _DEBUG
+		printf("= Accpted Socket\n");
+#endif
 
 		if (!socket_recv(clientsock, buffer, &buflen))
+		{
+#ifdef _DEBUG
+			printf("= Could not receive from Socket\n");
+#endif
+			shutdown(clientsock, SB_BOTH);
+			closesocket(clientsock);
 			continue;
+		}
 
 		if (buflen > 0)
 			server_handle_receive(clientsock, std::string(buffer));
+#ifdef _DEBUG
+		else
+			printf("= Socket didn't do nothing\n");
+#endif
 
 		shutdown(clientsock, SB_BOTH);
 		closesocket(clientsock);
@@ -58,9 +80,15 @@ void server_handle_receive(SOCKET clientsock, std::string& buffer)
 	if (buffer.empty())
 		return;
 
+#ifdef _DEBUG
+	printf("= Received %s from Socket\n", buffer.c_str());
+#endif
+
 	if ((buffer[0] != '\\') || (buffer.find("final\\") == std::string::npos))
 	{
-		printf("Request %s is not valid!\n", buffer.c_str());
+#ifdef _DEBUG
+		printf("= Request %s is not valid!\n", buffer.c_str());
+#endif
 		return;
 	}
 
@@ -70,7 +98,9 @@ void server_handle_receive(SOCKET clientsock, std::string& buffer)
 
 	if (found == std::string::npos)
 	{
-		printf("Cannot retrive request!\n");
+#ifdef _DEBUG
+		printf("= Cannot retrive request!\n");
+#endif
 		return;
 	}
 
@@ -82,6 +112,8 @@ void server_handle_receive(SOCKET clientsock, std::string& buffer)
 	}
 	else
 	{
-		printf("Unknown request: %s\n", req.c_str());
+#ifdef _DEBUG
+		printf("= Unknown request: %s\n", req.c_str());
+#endif
 	}
 }

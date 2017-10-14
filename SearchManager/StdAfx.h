@@ -9,6 +9,7 @@
 #define GPSP_VERSION "0.1-INDEV"
 
 extern int server_running;
+extern void console_pause();
 
 #define GP_EMAIL_LEN 51
 

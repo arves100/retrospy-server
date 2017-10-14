@@ -2,5 +2,6 @@
 #define _RSS_GPSP_SERVER_H_
 
 extern void server_handle_receive(SOCKET clientsock, std::string& buffer);
+extern void server_start();
 
 #endif

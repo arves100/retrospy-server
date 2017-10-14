@@ -1,11 +1,4 @@
-#define WIN32_LEAN_AND_MEAN
-#include <Windows.h>
-#include <WinSock2.h>
-#include <ws2tcpip.h>
-#include <stdio.h>
-
-#define GAMESPY_BUFLEN 1024
-
+#include "Common.h"
 #include "Socket.h"
 
 int socket_init()
@@ -135,24 +128,21 @@ int socket_accept(SOCKET listen, SOCKET *dest)
 	return 1;
 }
 
-char* socket_recv(SOCKET sock, int *lenout)
+int socket_recv(SOCKET sock, char* dst, int *dstlen)
 {
-	char recvbuf[GAMESPY_BUFLEN] = { 0 };
-	int recvbuflen = GAMESPY_BUFLEN;
-
-	*lenout = recv(sock, recvbuf, recvbuflen, 0);
-	if (*lenout > 0)
+	*dstlen = recv(sock, dst, GAMESPY_BUFLEN, 0);
+	if (*dstlen > 0)
 	{
-		printf("socket_recv: received %d bytes\n", *lenout);
-		return recvbuf;
+		printf("socket_recv: received %d bytes\n", *dstlen);
+		return TRUE;
 	}
 
-	if (*lenout == 0)
+	if (*dstlen == 0)
 		printf("socket_recv: client disconnected\n");
 	else
 		printf("Error in socket_recv: recv error: %d\n", WSAGetLastError());
 
-	return NULL;
+	return FALSE;
 }
 
 int socket_send(SOCKET sock, char *input, int length)

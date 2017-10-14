@@ -4,15 +4,12 @@
 #define COMMONSDK_VERSION "0.1"
 
 /*
+	Version 0.1.1
+		Added socket_connect
+		Redefined Socket API
 	Version 0.1
 		Initial WinSock2 Handling
 */
-
-#ifdef __cplusplus
-	#define C_LINKAGE "C"
-#else
-	#define C_LINKAGE
-#endif
 
 #if defined(_WIN32) || defined(WIN32) || defined(WINDOWS) || defined(_WINNT) || defined(_WIN64) || defined(__WIN32__)
 	#define PLATFORM_WINDOWS
@@ -32,7 +29,5 @@
 
 #define GAMESPY_BUFLEN 1024
 #define GAMESPY_GAMENAME_MAX 64
-
-#include "Socket.h"
 
 #endif

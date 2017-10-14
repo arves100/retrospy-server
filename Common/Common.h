@@ -26,7 +26,12 @@
 	#pragma comment(lib, "ws2_32.lib")
 #endif
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
 #define GAMESPY_BUFLEN 1024
+#define GAMESPY_GAMENAME_MAX 64
 
 #include "Socket.h"
 

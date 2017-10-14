@@ -178,5 +178,6 @@ void gamespy_nicks(SOCKET clientsock, std::string& buffer)
 	printf("= Successfully received nicks request:\n\tEmail: %s\n\tPassEnc: %s\n\tNameSpaceID: %s\n\tPartnerID: %s\n\tGameName: %s\n", email, passenc, namespaceid, partnerid, gamename);
 #endif
 
-	socket_send(clientsock, "\\error\\", 8);
+	//socket_send(clientsock, "\\nr\\0\\ndone\\final\\", 19); // Wrong Password/Error
+	socket_send(clientsock, "\\nr\\1\\nick\\test\\uniquenick\\testunique\\nick\\test2\\uniquenick\\test2unique\\ndone\\final\\", 102);
 }

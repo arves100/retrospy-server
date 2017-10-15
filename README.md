@@ -35,8 +35,6 @@ I'd like to have full Platforms and Compilers supported for this project.
 Notes
 ===
 
-- Currently the Server dosen't have any license (see [here](https://choosealicense.com/no-license/) for details), unless i decide.
-
 Special Thanks
 ===
 

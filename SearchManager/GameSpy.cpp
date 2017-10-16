@@ -10,6 +10,9 @@ void gamespy_valid(SOCKET clientsock, std::string& buffer)
 	std::string check = "";
 	size_t find = 0;
 
+	char query[QUERY_MAX_LEN] = { 0 }, *tail = 0;
+	sqlite3_stmt *stmt = 0;
+
 	while (TRUE)
 	{
 		find = buffer.find("\\");
@@ -74,7 +77,29 @@ void gamespy_valid(SOCKET clientsock, std::string& buffer)
 	printf("= Successfully received valid request:\n\tEmail: %s\n\tPartnerID: %s\n\tGameName: %s\n", email, partnerid, gamename);
 #endif
 
-	socket_send(clientsock, "\\vr\\1\\final\\", 13); // Send OK!
+	sprintf_s(query, QUERY_MAX_LEN, "SELECT id FROM users WHERE email=\"%s\"", email);
+
+	if (!database_prepare(query, strlen(query) + 1, &stmt, &tail))
+	{
+#ifdef _DEBUG
+		printf("= Query preparation failed!\n");
+#endif
+		socket_send(clientsock, "\\error", 7);
+		return;
+	}
+
+	if (database_step(stmt) == SQLITE_ROW)
+	{
+		if (sqlite3_column_int(stmt, 0) > 0)
+		{
+			socket_send(clientsock, "\\vr\\1\\final\\", 13);
+			database_finalize(stmt);
+			return;
+		}
+	}
+
+	database_finalize(stmt);
+	socket_send(clientsock, "\\vr\\0\\final\\", 13);
 }
 
 void gamespy_nicks(SOCKET clientsock, std::string& buffer)

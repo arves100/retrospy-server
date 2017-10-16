@@ -1,6 +1,6 @@
 #include "Common.h"
 #include "Database.h"
-#include "../Common/sqlite3.h"
+//#include "../Common/sqlite3.h"
 
 sqlite3 *database_sqlite = 0;
 
@@ -14,6 +14,28 @@ static int database_exec_callback(void *unused, int argc, char **argv, char **az
 
 	printf("\n");
 	return 0;
+}
+
+int database_prepare(const char *sql, int sql_length, sqlite3_stmt **ppStmt, char **pzTail)
+{
+	int result = 0;
+	result = sqlite3_prepare_v2(database_sqlite, sql, sql_length, ppStmt, pzTail);
+	if (result != SQLITE_OK)
+	{
+#ifdef _DEBUG
+		printf("Error in database_prepare: sqlite3_prepare_v2 returned error: %s\n", sqlite3_errstr(result));
+#endif
+		return 0;
+	}
+
+	return 1;
+}
+
+int database_step(sqlite3_stmt *stmt)
+{
+	int result = 0;
+	result = sqlite3_step(stmt);
+	return result;
 }
 
 int database_open(const char *name)
@@ -32,6 +54,11 @@ int database_open(const char *name)
 	}
 
 	return 1;
+}
+
+void database_finalize(sqlite3_stmt *stmt)
+{
+	sqlite3_finalize(stmt);
 }
 
 void database_close()

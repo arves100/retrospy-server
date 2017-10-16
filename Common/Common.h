@@ -29,6 +29,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "sqlite3.h"
+
 #define GAMESPY_BUFLEN 1024
 #define GAMESPY_GAMENAME_MAX 64
 #define QUERY_MAX_LEN 1024

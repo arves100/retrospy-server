@@ -118,7 +118,7 @@
     <ClInclude Include="sqlite3ext.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Database.c" />
+    <ClCompile Include="Database.cpp" />
     <ClCompile Include="shell.c" />
     <ClCompile Include="Socket.c" />
     <ClCompile Include="sqlite3.c" />

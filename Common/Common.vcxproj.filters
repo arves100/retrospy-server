@@ -44,7 +44,7 @@
     <ClCompile Include="sqlite3.c">
       <Filter>SQLite3</Filter>
     </ClCompile>
-    <ClCompile Include="Database.c">
+    <ClCompile Include="Database.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
   </ItemGroup>

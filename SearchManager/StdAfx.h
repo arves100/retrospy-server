@@ -1,8 +1,12 @@
 #ifndef _RSS_GPSP_STDAFX_H_
 #define _RSS_GPSP_STDAFX_H_
 
-#define GPSP_VERSION "0.1.2"
+#define GPSP_VERSION "0.1.3-R1"
 /*
+    Version 0.1.3 R1
+	    revision of database and current code in codes
+    Version 0.1.3
+	    added search
 	Version 0.1.2
 		database
 	Version 0.1.1
@@ -27,6 +31,8 @@ extern void console_pause();
 #define GP_PASSWORDENC_LEN          ((((GP_PASSWORD_LEN+2)*4)/3)+1)
 #define GP_NICK_LEN                 31
 #define GP_UNIQUENICK_LEN           21
+#define GP_FIRSTNAME_LEN            31
+#define GP_LASTNAME_LEN             31
 
 static const char *database_name = "retrospy.db";
 

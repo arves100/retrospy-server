@@ -3,5 +3,6 @@
 
 extern void gamespy_valid(SOCKET clientsock, std::string& buffer);
 extern void gamespy_nicks(SOCKET clientsock, std::string& buffer);
+extern void gamespy_search(SOCKET clientsock, std::string& buffer);
 
 #endif

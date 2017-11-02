@@ -38,7 +38,6 @@ void ResultQuery::close()
 
 bool ResultQuery::exec()
 {
-	const char *tail = 0;
 	int nTmp = 0;
 
 	if (query.length() < 1)
@@ -46,7 +45,7 @@ bool ResultQuery::exec()
 
 	if (!stmt)
 	{
-		if (!database_prepare(query.c_str(), query.length() + 1, &stmt, &tail))
+		if (!database_prepare(query.c_str(), query.length() + 1, &stmt, 0))
 			return false;
 
 		isClosed = false;
@@ -228,10 +227,9 @@ int database_exec_count_from_select(std::string &query, int *nOut)
 
 int database_exec_count(const char *query, int *nOut)
 {
-	const char *tail = 0;
 	sqlite3_stmt *stmt = 0;
 
-	if (!database_prepare(query, strlen(query) + 1, &stmt, &tail))
+	if (!database_prepare(query, strlen(query) + 1, &stmt, 0))
 	{
 		return 0;
 	}

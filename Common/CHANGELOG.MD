@@ -1,6 +1,6 @@
 Version 0.1.4
 	Added GSBuffer
-	Revert 0.1.3
+	New ResultQuery
 
 Version 0.1.3
 	Database Result Code

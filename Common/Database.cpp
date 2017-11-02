@@ -10,7 +10,6 @@ ResultQuery::ResultQuery(std::string query)
 	nCurrRow = 0;
 
 	stmt = 0;
-	tail = 0;
 
 	isClosed = true;
 
@@ -20,14 +19,12 @@ ResultQuery::ResultQuery(std::string query)
 ResultQuery::~ResultQuery()
 {
 	vector_free();
-
-	if (!isClosed)
-		close();
+	close();
 }
 
 void ResultQuery::close()
 {
-	if (!isClosed)
+	if (isClosed)
 		return;
 
 	database_finalize(stmt);
@@ -41,6 +38,7 @@ void ResultQuery::close()
 
 bool ResultQuery::exec()
 {
+	const char *tail = 0;
 	int nTmp = 0;
 
 	if (query.length() < 1)
@@ -48,7 +46,7 @@ bool ResultQuery::exec()
 
 	if (!stmt)
 	{
-		if (!database_prepare(query.c_str(), query.length(), &stmt, (const char **)&tail))
+		if (!database_prepare(query.c_str(), query.length() + 1, &stmt, &tail))
 			return false;
 
 		isClosed = false;
@@ -56,7 +54,7 @@ bool ResultQuery::exec()
 
 	if (nRows == -1)
 	{
-		if (!database_exec_count(query.c_str(), &nRows))
+		if (!database_exec_count_from_select(query, &nRows))
 			return false;
 	}
 	
@@ -92,7 +90,7 @@ void ResultQuery::vector_free()
 	for (; nTmp < values.size(); nTmp++)
 	{
 		if (values.at(nTmp))
-			free(values.at(nTmp));
+			sqlite3_value_free(values.at(nTmp));
 	}
 
 	values.clear();
@@ -104,7 +102,7 @@ bool ResultQuery::next()
 	return exec();
 }
 
-void * ResultQuery::get(unsigned int columnIndex)
+sqlite3_value *ResultQuery::get(unsigned int columnIndex)
 {
 	if (isClosed)
 		return 0;
@@ -207,11 +205,31 @@ int database_exec(const char *query)
 	return 1;
 }
 
+int database_exec_count_from_select(std::string &query, int *nOut)
+{
+	std::string qr2 = query;
+
+	size_t pos = query.find("SELECT ");
+	if (pos == std::string::npos)
+		return 0;
+
+	qr2 = query.replace(pos, 7, "SELECT COUNT(");
+
+	pos = qr2.find("FROM");
+	if (pos == std::string::npos)
+		return 0;
+
+	qr2 = qr2.replace(pos, 4, ") AS NumQuery FROM");
+	if (pos == std::string::npos)
+		return 0;
+
+	return database_exec_count(qr2.c_str(), nOut);
+}
+
 int database_exec_count(const char *query, int *nOut)
 {
 	const char *tail = 0;
 	sqlite3_stmt *stmt = 0;
-
 
 	if (!database_prepare(query, strlen(query) + 1, &stmt, &tail))
 	{

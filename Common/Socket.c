@@ -20,7 +20,7 @@ int socket_init()
 
 int socket_connect(const char *ip, int port, SOCKET* dest)
 {
-	char sport[6] = { 0 };
+	char sport[6];
 	struct addrinfo *result = NULL, *ptr = NULL, hints;
 	int ir = 0;
 	
@@ -71,7 +71,7 @@ int socket_bind(int port, SOCKET* dest)
 {
 	int iResult = 0;
 	struct addrinfo *result = NULL, *ptr = NULL, hints;
-	char real_port[6] = { 0 };
+	char real_port[6];
 
 	sprintf_s(real_port, 6, "%d", port);
 

@@ -1,7 +1,7 @@
 #ifndef _RSS_COMMON_COMMON_H_
 #define _RSS_COMMON_COMMON_H_
 
-#define COMMONSDK_VERSION "0.1.3"
+#define COMMONSDK_VERSION "0.1.4"
 
 #if defined(_WIN32) || defined(WIN32) || defined(WINDOWS) || defined(_WINNT) || defined(_WIN64) || defined(__WIN32__)
 	#define PLATFORM_WINDOWS

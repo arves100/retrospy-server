@@ -24,7 +24,7 @@ public:
 
 	bool wasNull() { return nRows > 0 ? false : true; }
 
-	std::string getString(unsigned int columnIndex) { std::string((const char *)get(columnIndex)); }
+	std::string getString(unsigned int columnIndex) { return std::string((const char *)get(columnIndex)); }
 	bool getBoolean(unsigned int columnIndex) { return getInt(columnIndex) > 0 ? true : false; }
 	int getInt(unsigned int columnIndex) { return (int)get(columnIndex); }
 	long getLong(unsigned int columnIndex) { return (long)get(columnIndex); }

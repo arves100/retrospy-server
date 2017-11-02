@@ -30,12 +30,12 @@ std::string gamespy_buffer_get(std::string &buffer, std::string what)
 
 void gamespy_valid(SOCKET clientsock, std::string& buffer)
 {
-	char email[GP_EMAIL_LEN] = { 0 };
+	char email[GP_EMAIL_LEN];
 	int partnerid = 0;
-	char gamename[GAMESPY_GAMENAME_MAX] = { 0 };
+	char gamename[GAMESPY_GAMENAME_MAX];
 	
-	char query[QUERY_MAX_LEN] = { 0 };
-	SQLResult sResult = { 0 };
+	char query[QUERY_MAX_LEN];
+	SQLResult sResult;
 
 	if (!gamespy_buffer_validate(buffer))
 	{
@@ -73,16 +73,16 @@ void gamespy_valid(SOCKET clientsock, std::string& buffer)
 void gamespy_nicks(SOCKET clientsock, std::string& buffer)
 {
 	int userid = 0;
-	char email[GP_EMAIL_LEN] = { 0 };
+	char email[GP_EMAIL_LEN];
 	int partnerid = 0;
-	char gamename[GAMESPY_GAMENAME_MAX] = { 0 };
+	char gamename[GAMESPY_GAMENAME_MAX];
 	int namespaceid = 0;
-	char passenc[GP_PASSWORDENC_LEN] = { 0 };
-	char nickname[GP_NICK_LEN] = { 0 };
-	char uniquenick[GP_UNIQUENICK_LEN] = { 0 };
+	char passenc[GP_PASSWORDENC_LEN];
+	char nickname[GP_NICK_LEN];
+	char uniquenick[GP_UNIQUENICK_LEN];
 
-	char query[QUERY_MAX_LEN] = { 0 };
-	SQLResult sResult = { 0 };
+	char query[QUERY_MAX_LEN];
+	SQLResult sResult;
 	
 	strcpy_s(email, GP_EMAIL_LEN, gamespy_buffer_get(buffer, "email").c_str());
 	strcpy_s(gamename, GAMESPY_GAMENAME_MAX, gamespy_buffer_get(buffer, "gamename").c_str());
@@ -119,7 +119,7 @@ void gamespy_nicks(SOCKET clientsock, std::string& buffer)
 
 	printf("Affected Col: %d\n", sResult.nAffectedColumns);
 
-	userid = (int)sResult.pResult[0][0]; // Row 0: Column 0
+	userid = (int)sResult.pResult[0]; // Row 0: Column 0
 
 	if (userid == 0)
 	{
@@ -186,22 +186,22 @@ void gamespy_nicks(SOCKET clientsock, std::string& buffer)
 void gamespy_search(SOCKET clientsock, std::string& buffer)
 {
 #if 0
-	char sesskey[sizeof(int)] = { 0 };
-	char profileid[sizeof(int)] = { 0 };
-	char namespaceid[sizeof(int)] = { 0 };
-	char partnerid[sizeof(int)] = { 0 };
+	char sesskey[sizeof(int)];
+	char profileid[sizeof(int)];
+	char namespaceid[sizeof(int)];
+	char partnerid[sizeof(int)]
 
 	// Optional Parametra
-	char nickname[GP_NICK_LEN] = { 0 }; //nick
-	char uniqnick[GP_UNIQUENICK_LEN] = { 0 }; //uniquenick
-	char email[GP_EMAIL_LEN] = { 0 };
-	char firstname[GP_FIRSTNAME_LEN] = { 0 };
-	char lastname[GP_LASTNAME_LEN] = { 0 };
-	char icquin[sizeof(int)] = { 0 };
-	char skip[sizeof(int)] = { 0 };
+	char nickname[GP_NICK_LEN]; //nick
+	char uniqnick[GP_UNIQUENICK_LEN]; //uniquenick
+	char email[GP_EMAIL_LEN];
+	char firstname[GP_FIRSTNAME_LEN];
+	char lastname[GP_LASTNAME_LEN];
+	char icquin[sizeof(int)];
+	char skip[sizeof(int)];
 	
 	// End Parametra
-	char gamename[GAMESPY_GAMENAME_MAX] = { 0 };
+	char gamename[GAMESPY_GAMENAME_MAX];
 	
 	/*
 		Request: \search\\
@@ -219,7 +219,7 @@ void gamespy_search(SOCKET clientsock, std::string& buffer)
 	
 	
 
-	char query[QUERY_MAX_LEN] = { 0 }, *tail = 0;
+	char query[QUERY_MAX_LEN], *tail = 0;
 	sqlite3_stmt *stmt = 0;
 
 	std::string check = "";

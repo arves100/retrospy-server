@@ -6,8 +6,8 @@ int server_running = FALSE;
 
 int server_init_database()
 {
-	char buffer[QUERY_MAX_LEN] = { 0 };
-	
+	char buffer[QUERY_MAX_LEN];
+
 	if (!database_exec("SELECT id FROM users"))
 	{
 		sprintf_s(buffer, QUERY_MAX_LEN, "CREATE TABLE IF NOT EXISTS users(id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, email VARCHAR(%d) NOT NULL, password VARCHAR(%d) NOT NULL)", GP_EMAIL_LEN, GP_PASSWORDENC_LEN);
@@ -69,7 +69,7 @@ void server_start()
 	while (server_running)
 	{
 		SOCKET clientsock = INVALID_SOCKET;
-		char buffer[GAMESPY_BUFLEN] = { 0 };
+		char buffer[GAMESPY_BUFLEN];
 		int buflen = 0;
 
 		if (!socket_accept(listensock, &clientsock))

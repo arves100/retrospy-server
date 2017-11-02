@@ -23,7 +23,7 @@ void gamespy_valid(SOCKET clientsock, std::string& buffer)
 	printf("= Successfully received valid request:\n\tEmail: %s\n\tPartnerID: %d\n\tGameName: %s\n", email, partnerid, gamename);
 #endif
 
-	sprintf_s(query, QUERY_MAX_LEN, "SELECT id FROM users WHERE email=\"%s\"", email);
+	sprintf_s(query, QUERY_MAX_LEN, "SELECT COUNT(id) AS NumIDS FROM users WHERE email=\"%s\"", email);
 
 	if (!database_exec_count(query, &rows))
 		return;
@@ -46,6 +46,8 @@ void gamespy_nicks(SOCKET clientsock, std::string& buffer)
 	char uniquenick[GP_UNIQUENICK_LEN];
 
 	char query[QUERY_MAX_LEN];
+
+	ResultQuery *result = 0;
 	
 	strcpy_s(email, GP_EMAIL_LEN, gamespy_buffer_get(buffer, "email").c_str());
 	strcpy_s(gamename, GAMESPY_GAMENAME_MAX, gamespy_buffer_get(buffer, "gamename").c_str());
@@ -66,11 +68,12 @@ void gamespy_nicks(SOCKET clientsock, std::string& buffer)
 		strcat_s(query, QUERY_MAX_LEN, "\"");
 	}
 
-	ResultQuery *result = new ResultQuery(query);
+	result = new ResultQuery(query);
 
 	if (!result->next())
 	{
 		delete result;
+		socket_send(clientsock, "\\nr\\0\\ndone\\final\\", 19); // Send ERROR if no nick exists
 		return;
 	}
 
@@ -80,7 +83,6 @@ void gamespy_nicks(SOCKET clientsock, std::string& buffer)
 		printf("= No nicknames found\n");
 #endif
 		socket_send(clientsock, "\\nr\\0\\ndone\\final\\", 19); // Send ERROR if no nick exists
-
 		delete result;
 		return;
 	}
@@ -98,17 +100,15 @@ void gamespy_nicks(SOCKET clientsock, std::string& buffer)
 	}
 
 	delete result; // Free first result query
-	query[0] = '\0'; // Reset query array
+	//query[0] = '\0'; // Reset query array
+//	memset(query, '\0', sizeof(query));
 
 	printf("= ID Found: %d\n", userid);
 
-	sprintf_s(query, QUERY_MAX_LEN, "SELECT nickname, unique_nickname FROM nicks WHERE acc_id=\"%d\"", userid);
-
-	result = new ResultQuery(query);
+	result = new ResultQuery(std::string("SELECT nickname, unique_nickname FROM nicks WHERE acc_id=" + std::to_string(userid)));
 
 	if (!result->next())
 	{
-		socket_send(clientsock, "\\error", 7);
 		delete result;
 		return;
 	}
@@ -190,7 +190,7 @@ void gamespy_search(SOCKET clientsock, std::string& buffer)
 	
 	
 
-	char query[QUERY_MAX_LEN], *tail = 0;
+	char query[QUERY_MAX_LEN];
 	sqlite3_stmt *stmt = 0;
 
 	std::string check = "";
@@ -295,12 +295,11 @@ void gamespy_search(SOCKET clientsock, std::string& buffer)
 		strcat_s(query, QUERY_MAX_LEN, "\"");
 	}
 
-	if (!database_prepare(query, strlen(query) + 1, &stmt, &tail))
+	if (!database_prepare(query, strlen(query) + 1, &stmt, 0))
 	{
 #ifdef _DEBUG
 		printf("= Query preparation failed!\n");
 #endif
-		socket_send(clientsock, "\\error", 7);
 		return;
 	}
 
@@ -326,12 +325,11 @@ void gamespy_search(SOCKET clientsock, std::string& buffer)
 	memset(query, '\0', sizeof(query)); // Reset query array
 	sprintf_s(query, QUERY_MAX_LEN, "SELECT nickname, unique_nickname FROM nicks WHERE acc_id=\"%d\"", his_id);
 
-	if (!database_prepare(query, strlen(query) + 1, &stmt, &tail))
+	if (!database_prepare(query, strlen(query) + 1, &stmt, 0))
 	{
 #ifdef _DEBUG
 		printf("= Query preparation failed!\n");
 #endif
-		socket_send(clientsock, "\\error", 7);
 		return;
 	}
 

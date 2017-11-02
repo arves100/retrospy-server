@@ -1,30 +1,135 @@
 #include "Common.h"
 #include "Database.hpp"
 
-//#include <vector>
+// ResultQuery Class
 
-sqlite3 *database_sqlite = 0;
-
-// Commetazione
-/*void sqlresult_free(SQLResult sql)
+ResultQuery::ResultQuery(std::string query)
 {
-	int i = 0;
+	nRows = -1;
+	nColumns = -1;
+	nCurrRow = 0;
 
-//	sql.nAffectedColumns
-//	sql.nAffectedRows
+	stmt = 0;
+	tail = 0;
 
-	for (; i < sql.nAffectedRows; i++)
+	isClosed = true;
+
+	ResultQuery::query = query;
+}
+
+ResultQuery::~ResultQuery()
+{
+	vector_free();
+
+	if (!isClosed)
+		close();
+}
+
+void ResultQuery::close()
+{
+	if (!isClosed)
+		return;
+
+	database_finalize(stmt);
+
+	isClosed = true;
+
+	nCurrRow = 0;
+	nRows = -1;
+	nColumns = -1;
+}
+
+bool ResultQuery::exec()
+{
+	int nTmp = 0;
+
+	if (query.length() < 1)
+		return false;
+
+	if (!stmt)
 	{
-		if (sql.pResult[i])
-			delete[] sql.pResult[i];
+		if (!database_prepare(query.c_str(), query.length(), &stmt, (const char **)&tail))
+			return false;
+
+		isClosed = false;
 	}
 
-	delete[] sql.pResult;
+	if (nRows == -1)
+	{
+		if (!database_exec_count(query.c_str(), &nRows))
+			return false;
+	}
+	
+	if (nColumns == -1)
+	{
+		nColumns = sqlite3_column_count(stmt);
+		if (nColumns < 1)
+			return false;
+	}
 
-	sql.nAffectedColumns = 0;
-	sql.nAffectedRows = 0;
-	sql.pResult = 0;
-}*/
+	if (isLast())
+		return false;
+
+	if (wasNull())
+		return true; //Don't continue if the column is null
+
+	if (database_step(stmt) == SQLITE_ROW)
+	{
+		for (; nTmp < nColumns; nTmp++)
+			values.push_back(sqlite3_column_value(stmt, nTmp));
+
+		nCurrRow++;
+	}
+	else
+		return false; // No row
+
+	return true;
+}
+
+void ResultQuery::vector_free()
+{
+	unsigned int nTmp = 0;
+	for (; nTmp < values.size(); nTmp++)
+	{
+		if (values.at(nTmp))
+			free(values.at(nTmp));
+	}
+
+	values.clear();
+}
+
+bool ResultQuery::next()
+{
+	vector_free();
+	return exec();
+}
+
+void * ResultQuery::get(unsigned int columnIndex)
+{
+	if (isClosed)
+		return 0;
+
+	if (wasNull())
+		return 0;
+
+	if (nCurrRow == 0)
+		return 0;
+
+	if (nCurrRow > nRows)
+		return 0;
+
+	if (columnIndex > (unsigned)nColumns)
+		return 0;
+
+	if (values.size() < columnIndex)
+		return 0;
+
+	return values.at(columnIndex);
+}
+
+// Normal Database API
+
+sqlite3 *database_sqlite = 0;
 
 static int database_exec_callback(void *unused, int argc, char **argv, char **azColName)
 {
@@ -124,55 +229,6 @@ int database_exec_count(const char *query, int *nOut)
 	return 1;
 }
 
-/*int database_exec_result(const char *query, SQLResult *pOut)
-{
-	const char *tail = 0;
-	sqlite3_stmt *stmt = 0;
-	int i = 0;
-
-	std::vector<SQLResult *> vector;
-	
-	if (!database_prepare(query, strlen(query) + 1, &stmt, &tail))
-	{
-		return 0;
-	}
-
-	pOut->nAffectedColumns = sqlite3_column_count(stmt);
-
-	while (database_step(stmt) == SQLITE_ROW)
-	{
-
-		//void **pCurrent = new void *[pOut->nAffectedColumns];
-
-		for (; i < pOut->nAffectedColumns; i++)
-		{
-			SQLValue val;
-			val.lpValue = sqlite3_column_value(stmt, i);
-
-		//	vector.push_back(val);
-			//pCurrent[i] = (void **)sqlite3_column_blob(stmt, i);
-		}
-		
-		//vector.push_back(pCurrent);
-	}
-
-	database_finalize(stmt); // Free stmt
-	i = 0;*/
-
-/*	pOut->nAffectedRows = vector.size();
-
-	pOut->pResult = new int[pOut->nAffectedRows][pOut->nAffectedColumns];
-
-	for (; i < pOut->nAffectedRows; i++)
-	{
-		pOut->pResult[i] = vector.at(i);
-	}
-
-	vector.clear(); // Clear the vector memory*/
-
-/*	return 1;
-}*/
-
 int database_is_column_null(sqlite3_stmt *stmt, int column)
 {
 	if (sqlite3_column_type(stmt, column) == SQLITE_NULL)
@@ -180,43 +236,3 @@ int database_is_column_null(sqlite3_stmt *stmt, int column)
 	
 	return 0;
 }
-
-/*if (!database_prepare(query, strlen(query) + 1, &stmt, &tail))
-{
-#ifdef _DEBUG
-printf("= Query preparation failed!\n");
-#endif
-socket_send(clientsock, "\\error", 7);
-return;
-}
-
-
-while (database_step(stmt) == SQLITE_ROW)
-{
-if ((sqlite3_column_type(stmt, 0) != SQLITE_NULL) || (sqlite3_column_type(stmt, 1) != SQLITE_NULL))
-{
-nickname = (char *)sqlite3_column_text(stmt, 0);
-uniquenick = (char *)sqlite3_column_text(stmt, 1);
-
-#ifdef _DEBUG
-printf("= Got %s and %s for row %d\n", nickname, uniquenick, his_id);
-#endif
-
-strcat_s(query, QUERY_MAX_LEN, "nick\\");
-strcat_s(query, QUERY_MAX_LEN, nickname);
-strcat_s(query, QUERY_MAX_LEN, "\\uniquenick\\");
-strcat_s(query, QUERY_MAX_LEN, uniquenick);
-strcat_s(query, QUERY_MAX_LEN, "\\");
-}
-else
-{
-break; // Reached the end
-}
-
-his_id++;
-}
-
-
-}
-
-*/

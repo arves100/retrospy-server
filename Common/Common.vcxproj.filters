@@ -41,9 +41,6 @@
     <ClCompile Include="Socket.c">
       <Filter>File di origine</Filter>
     </ClCompile>
-    <ClCompile Include="shell.c">
-      <Filter>SQLite3</Filter>
-    </ClCompile>
     <ClCompile Include="sqlite3.c">
       <Filter>SQLite3</Filter>
     </ClCompile>

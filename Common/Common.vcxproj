@@ -121,7 +121,6 @@
   <ItemGroup>
     <ClCompile Include="Database.cpp" />
     <ClCompile Include="GSBuffer.cpp" />
-    <ClCompile Include="shell.c" />
     <ClCompile Include="Socket.c" />
     <ClCompile Include="sqlite3.c" />
   </ItemGroup>

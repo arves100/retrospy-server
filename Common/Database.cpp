@@ -1,11 +1,12 @@
 #include "Common.h"
-#include "Database.h"
+#include "Database.hpp"
 
-#include <vector>
+//#include <vector>
 
 sqlite3 *database_sqlite = 0;
 
-void sqlresult_free(SQLResult sql)
+// Commetazione
+/*void sqlresult_free(SQLResult sql)
 {
 	int i = 0;
 
@@ -23,7 +24,7 @@ void sqlresult_free(SQLResult sql)
 	sql.nAffectedColumns = 0;
 	sql.nAffectedRows = 0;
 	sql.pResult = 0;
-}
+}*/
 
 static int database_exec_callback(void *unused, int argc, char **argv, char **azColName)
 {
@@ -123,13 +124,13 @@ int database_exec_count(const char *query, int *nOut)
 	return 1;
 }
 
-int database_exec_result(const char *query, SQLResult *pOut)
+/*int database_exec_result(const char *query, SQLResult *pOut)
 {
 	const char *tail = 0;
 	sqlite3_stmt *stmt = 0;
 	int i = 0;
 
-	std::vector<void **> vector;
+	std::vector<SQLResult *> vector;
 	
 	if (!database_prepare(query, strlen(query) + 1, &stmt, &tail))
 	{
@@ -140,31 +141,37 @@ int database_exec_result(const char *query, SQLResult *pOut)
 
 	while (database_step(stmt) == SQLITE_ROW)
 	{
-		void **pCurrent = new void *[pOut->nAffectedColumns];
+
+		//void **pCurrent = new void *[pOut->nAffectedColumns];
 
 		for (; i < pOut->nAffectedColumns; i++)
 		{
-			pCurrent[i] = (void **)sqlite3_column_blob(stmt, i);
+			SQLValue val;
+			val.lpValue = sqlite3_column_value(stmt, i);
+
+		//	vector.push_back(val);
+			//pCurrent[i] = (void **)sqlite3_column_blob(stmt, i);
 		}
 		
-		vector.push_back(pCurrent);
+		//vector.push_back(pCurrent);
 	}
 
 	database_finalize(stmt); // Free stmt
-	i = 0;
+	i = 0;*/
 
-	pOut->nAffectedRows = vector.size();
-	pOut->pResult = new void **[pOut->nAffectedRows];
+/*	pOut->nAffectedRows = vector.size();
+
+	pOut->pResult = new int[pOut->nAffectedRows][pOut->nAffectedColumns];
 
 	for (; i < pOut->nAffectedRows; i++)
 	{
 		pOut->pResult[i] = vector.at(i);
 	}
 
-	vector.clear(); // Clear the vector memory
+	vector.clear(); // Clear the vector memory*/
 
-	return 1;
-}
+/*	return 1;
+}*/
 
 int database_is_column_null(sqlite3_stmt *stmt, int column)
 {

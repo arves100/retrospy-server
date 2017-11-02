@@ -1,20 +1,26 @@
-#ifndef _RSS_COMMON_DATABASE_H_
-#define _RSS_COMMON_DATABASE_H_
+#ifndef _RSS_COMMON_DATABASE_HPP_
+#define _RSS_COMMON_DATABASE_HPP_
 
 /*#ifdef __cplusplus
 extern "C" {
 #endif*/
 
+/*typedef struct _rss_common_sqlvalue_
+{
+	sqlite3_value *lpValue;
+} SQLValue;
+
 typedef struct _rss_common_sqlresult_
 {
 	int nAffectedColumns;
 	int nAffectedRows;
-	void ***pResult;
+	sqlite3_value *value;
+	SQLResult *_next;
 } SQLResult;
 
-extern void sqlresult_free(SQLResult sql);
+extern void sqlresult_free(SQLResult sql);*/
 
-extern int database_exec_result(const char *query, SQLResult *pOut);
+//extern int database_exec_result(const char *query, SQLResult *pOut);
 extern int database_exec_count(const char *query, int *nOut);
 
 extern int database_is_column_null(sqlite3_stmt *stmt, int column);

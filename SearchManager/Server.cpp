@@ -1,6 +1,7 @@
 #include "StdAfx.h"
 #include "Server.h"
 #include "GameSpy.h"
+#include "../Common/GSBuffer.hpp"
 
 int server_running = FALSE;
 
@@ -125,7 +126,7 @@ void server_handle_receive(SOCKET clientsock, std::string& buffer)
 	printf("= Received %s from Socket\n", buffer.c_str());
 #endif
 
-	if ((buffer[0] != '\\') || (buffer.find("final\\") == std::string::npos))
+	if ((buffer[0] != '\\') || (!gamespy_buffer_validate(buffer)))
 	{
 #ifdef _DEBUG
 		printf("= Request %s is not valid!\n", buffer.c_str());

@@ -134,6 +134,7 @@
     <ClInclude Include="StdAfx.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="CHANGELOG.MD" />
     <None Include="README.MD" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

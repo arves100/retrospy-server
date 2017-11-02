@@ -1,23 +1,11 @@
 #ifndef _RSS_GPSP_STDAFX_H_
 #define _RSS_GPSP_STDAFX_H_
 
-#define GPSP_VERSION "0.1.3-R1"
-/*
-    Version 0.1.3 R1
-	    revision of database and current code in codes
-    Version 0.1.3
-	    added search
-	Version 0.1.2
-		database
-	Version 0.1.1
-		nicks handling
-	Version 0.1
-		valid handling
-*/
+#define GPSP_VERSION "0.1.3-R2"
 
 #include "../Common/Common.h"
 #include "../Common/Socket.h"
-#include "../Common/Database.h"
+#include "../Common/Database.hpp"
 
 #include <string>
 

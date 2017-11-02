@@ -1,21 +1,16 @@
 #include "StdAfx.h"
 #include "GameSpy.h"
+#include "..\Common\Database.hpp"
+#include "..\Common\GSBuffer.hpp"
 
 void gamespy_valid(SOCKET clientsock, std::string& buffer)
 {
 	char email[GP_EMAIL_LEN];
 	int partnerid = 0;
 	char gamename[GAMESPY_GAMENAME_MAX];
-	
-	char query[QUERY_MAX_LEN];
-	SQLResult sResult;
 
-	if (!gamespy_buffer_validate(buffer))
-	{
-#ifdef _DEBUG
-		printf("= Error: request is invalid!\n");
-#endif
-	}
+	char query[QUERY_MAX_LEN];
+	int rows = 0;
 
 	strcpy_s(email, GP_EMAIL_LEN, gamespy_buffer_get(buffer, "email").c_str());
 	partnerid = std::stoi(gamespy_buffer_get(buffer, "partnerid"));
@@ -30,17 +25,13 @@ void gamespy_valid(SOCKET clientsock, std::string& buffer)
 
 	sprintf_s(query, QUERY_MAX_LEN, "SELECT id FROM users WHERE email=\"%s\"", email);
 
-	if (!database_exec_result(query, &sResult))
-	{
+	if (!database_exec_count(query, &rows))
 		return;
-	}
 
-	if (sResult.nAffectedRows > 0)
+	if (rows > 0)
 		socket_send(clientsock, "\\vr\\1\\final\\", 13);
 	else
 		socket_send(clientsock, "\\vr\\0\\final\\", 13);
-
-	sqlresult_free(sResult);
 }
 
 void gamespy_nicks(SOCKET clientsock, std::string& buffer)
@@ -55,7 +46,6 @@ void gamespy_nicks(SOCKET clientsock, std::string& buffer)
 	char uniquenick[GP_UNIQUENICK_LEN];
 
 	char query[QUERY_MAX_LEN];
-	SQLResult sResult;
 	
 	strcpy_s(email, GP_EMAIL_LEN, gamespy_buffer_get(buffer, "email").c_str());
 	strcpy_s(gamename, GAMESPY_GAMENAME_MAX, gamespy_buffer_get(buffer, "gamename").c_str());
@@ -76,23 +66,30 @@ void gamespy_nicks(SOCKET clientsock, std::string& buffer)
 		strcat_s(query, QUERY_MAX_LEN, "\"");
 	}
 
-	if (!database_exec_result(query, &sResult))
+	ResultQuery *result = new ResultQuery(query);
+
+	if (!result->next())
 	{
+		delete result;
 		return;
 	}
 
-	if (sResult.nAffectedRows < 1)
+	if (result->getAffectedRows() < 1)
 	{
 #ifdef _DEBUG
 		printf("= No nicknames found\n");
 #endif
 		socket_send(clientsock, "\\nr\\0\\ndone\\final\\", 19); // Send ERROR if no nick exists
+
+		delete result;
 		return;
 	}
 
-	printf("Affected Col: %d\n", sResult.nAffectedColumns);
+#ifdef _DEBUG
+	printf("Affected Col: %d\n", result->getAffectedColumns());
+#endif
 
-	userid = (int)sResult.pResult[0]; // Row 0: Column 0
+	userid = result->getInt(0); // Row 0: Column 0
 
 	if (userid == 0)
 	{
@@ -100,56 +97,57 @@ void gamespy_nicks(SOCKET clientsock, std::string& buffer)
 		return;
 	}
 
-	sqlresult_free(sResult);
-	memset(query, '\0', sizeof(query)); // Reset query array
+	delete result; // Free first result query
+	query[0] = '\0'; // Reset query array
 
 	printf("= ID Found: %d\n", userid);
 
 	sprintf_s(query, QUERY_MAX_LEN, "SELECT nickname, unique_nickname FROM nicks WHERE acc_id=\"%d\"", userid);
 
-	if (!database_exec_result(query, &sResult))
+	result = new ResultQuery(query);
+
+	if (!result->next())
 	{
 		socket_send(clientsock, "\\error", 7);
+		delete result;
 		return;
 	}
 
 	memset(query, '\0', sizeof(query)); // Reset query array
 
-	if (sResult.nAffectedRows < 1)
+	if (result->getAffectedRows() < 1)
 	{
 #ifdef _DEBUG
 		printf("= No profile exists\n");
 #endif
 		socket_send(clientsock, "\\nr\\0\\ndone\\final\\", 19); // No profile exists
 
-		sqlresult_free(sResult); // Free sqlresult
+		delete result;
 		return;
 	}
 
 	strcpy_s(query, QUERY_MAX_LEN, "\\nr\\1\\");
 
-	userid = 0; // Use this as count variable
-
-	while (userid < sResult.nAffectedRows)
+	do
 	{
-		strcpy_s(nickname, GP_NICK_LEN, (char *)sResult.pResult[userid][0]);
-		strcpy_s(uniquenick, GP_UNIQUENICK_LEN, (char *)sResult.pResult[userid][1]);
-
+		strcpy_s(nickname, GP_NICK_LEN, result->getString(0).c_str());
+		strcpy_s(uniquenick, GP_UNIQUENICK_LEN, result->getString(1).c_str());
 
 #ifdef _DEBUG
-		printf("= Got %s and %s for row %d\n", nickname, uniquenick, userid);
+		printf("= Got %s and %s\n", nickname, uniquenick);
 #endif
-
 		strcat_s(query, QUERY_MAX_LEN, "nick\\");
 		strcat_s(query, QUERY_MAX_LEN, nickname);
 		strcat_s(query, QUERY_MAX_LEN, "\\uniquenick\\");
 		strcat_s(query, QUERY_MAX_LEN, uniquenick);
 		strcat_s(query, QUERY_MAX_LEN, "\\");
 
-		userid++;
-	}
+		if (!result->next())
+			break; // End of usernames
 
-	sqlresult_free(sResult);
+	} while (true);
+
+	delete result;
 
 	strcat_s(query, QUERY_MAX_LEN, "ndone\\final\\"); // All done
 

@@ -38,5 +38,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="README.MD" />
+    <None Include="CHANGELOG.MD" />
   </ItemGroup>
 </Project>

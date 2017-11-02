@@ -112,17 +112,22 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Common.h" />
-    <ClInclude Include="Database.h" />
-    <ClInclude Include="GSBuffer.h" />
+    <ClInclude Include="Database.hpp" />
+    <ClInclude Include="GSBuffer.hpp" />
     <ClInclude Include="Socket.h" />
     <ClInclude Include="sqlite3.h" />
     <ClInclude Include="sqlite3ext.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Database.cpp" />
+    <ClCompile Include="GSBuffer.cpp" />
     <ClCompile Include="shell.c" />
     <ClCompile Include="Socket.c" />
     <ClCompile Include="sqlite3.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="CHANGELOG.MD" />
+    <None Include="README.MD" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

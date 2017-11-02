@@ -30,10 +30,10 @@
     <ClInclude Include="sqlite3ext.h">
       <Filter>SQLite3</Filter>
     </ClInclude>
-    <ClInclude Include="Database.h">
+    <ClInclude Include="GSBuffer.hpp">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="GSBuffer.h">
+    <ClInclude Include="Database.hpp">
       <Filter>File di intestazione</Filter>
     </ClInclude>
   </ItemGroup>
@@ -50,5 +50,12 @@
     <ClCompile Include="Database.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
+    <ClCompile Include="GSBuffer.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="README.MD" />
+    <None Include="CHANGELOG.MD" />
   </ItemGroup>
 </Project>

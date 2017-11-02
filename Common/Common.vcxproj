@@ -113,6 +113,7 @@
   <ItemGroup>
     <ClInclude Include="Common.h" />
     <ClInclude Include="Database.h" />
+    <ClInclude Include="GSBuffer.h" />
     <ClInclude Include="Socket.h" />
     <ClInclude Include="sqlite3.h" />
     <ClInclude Include="sqlite3ext.h" />

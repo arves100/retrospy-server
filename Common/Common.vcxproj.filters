@@ -33,6 +33,9 @@
     <ClInclude Include="Database.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
+    <ClInclude Include="GSBuffer.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Socket.c">

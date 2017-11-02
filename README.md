@@ -6,24 +6,7 @@ This Server is completly rewritten from scratch in C/C++.
 Status
 ===
 
-Currently the GPSP (SearchManager Server) can check for /nicks and /valid requests
-
-Everything works only on Windows (WinSock2)
-
-What needs to be Done
-===
-
-- Everything else
-
-- Async Feature with WS2
-
-- Conversion to Linux Sockets
-
-- Testing,Testing, Testing
-
-- Switch to CMake for Cross-Compiling
-
-- Database Support (WIP)
+See a specific folder of a Server project for Status/Features
 
 Contribution
 ===

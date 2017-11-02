@@ -1,4 +1,0 @@
-#ifndef _RSS_COMMON_DATABASE_HPP_
-#define _RSS_COMMON_DATABASE_HPP_
-
-#endif

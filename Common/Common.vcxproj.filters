@@ -38,7 +38,7 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Socket.c">
+    <ClCompile Include="Socket_ws2.c">
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="sqlite3.c">

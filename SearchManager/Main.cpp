@@ -1,7 +1,7 @@
 #include "StdAfx.h"
 #include "Server.h"
 
-int main(int argc, char **argv)
+int main()
 {
 	printf("RetroSpy Search Manager Server v%s (Common SDK v%s)\n\n", GPSP_VERSION, COMMONSDK_VERSION);
 

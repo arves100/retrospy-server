@@ -114,7 +114,7 @@ void server_start()
 	socket_destroy();
 }
 
-void server_handle_receive(SOCKET clientsock, std::string& buffer)
+void server_handle_receive(SOCKET clientsock, std::string buffer)
 {
 	size_t found = 0;
 	std::string req = "";

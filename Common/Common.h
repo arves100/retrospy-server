@@ -25,4 +25,8 @@
 #define GAMESPY_GAMENAME_MAX 64
 #define QUERY_MAX_LEN 1024
 
+#define SAFE_DELETE(x) if (x) delete x; x = 0;
+#define SAFE_ARRAY_DELETE(x) if (x) delete[] x; x = 0;
+#define SAFE_SQLITE_FREE(x) if (x) sqlite3_free(x); x = 0;
+
 #endif

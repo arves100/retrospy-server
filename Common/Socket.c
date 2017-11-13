@@ -70,7 +70,7 @@ int socket_connect(const char *ip, int port, SOCKET* dest)
 int socket_bind(int port, SOCKET* dest)
 {
 	int iResult = 0;
-	struct addrinfo *result = NULL, *ptr = NULL, hints;
+	struct addrinfo *result = NULL, hints;
 	char real_port[6];
 
 	sprintf_s(real_port, 6, "%d", port);

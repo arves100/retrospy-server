@@ -3,7 +3,7 @@
 #include "..\Common\Database.hpp"
 #include "..\Common\GSBuffer.hpp"
 
-void gamespy_valid(SOCKET clientsock, std::string& buffer)
+void gamespy_valid(SOCKET clientsock, std::string buffer)
 {
 	char email[GP_EMAIL_LEN];
 	int partnerid = 0;
@@ -34,7 +34,7 @@ void gamespy_valid(SOCKET clientsock, std::string& buffer)
 		socket_send(clientsock, "\\vr\\0\\final\\", 13);
 }
 
-void gamespy_nicks(SOCKET clientsock, std::string& buffer)
+void gamespy_nicks(SOCKET clientsock, std::string buffer)
 {
 	int userid = 0;
 	char email[GP_EMAIL_LEN];
@@ -46,6 +46,7 @@ void gamespy_nicks(SOCKET clientsock, std::string& buffer)
 	char uniquenick[GP_UNIQUENICK_LEN];
 
 	char query[QUERY_MAX_LEN];
+	char temp[QUERY_MAX_LEN];
 
 	ResultQuery *result = 0;
 	
@@ -68,12 +69,12 @@ void gamespy_nicks(SOCKET clientsock, std::string& buffer)
 		strcat_s(query, QUERY_MAX_LEN, "\"");
 	}
 
-	result = new ResultQuery(query);
+	result = new ResultQuery();
 
-	if (!result->next())
+	if (!result->next(query))
 	{
-		delete result;
 		socket_send(clientsock, "\\nr\\0\\ndone\\final\\", 19); // Send ERROR if no nick exists
+		SAFE_DELETE(result);
 		return;
 	}
 
@@ -83,7 +84,7 @@ void gamespy_nicks(SOCKET clientsock, std::string& buffer)
 		printf("= No nicknames found\n");
 #endif
 		socket_send(clientsock, "\\nr\\0\\ndone\\final\\", 19); // Send ERROR if no nick exists
-		delete result;
+		SAFE_DELETE(result);
 		return;
 	}
 
@@ -96,24 +97,23 @@ void gamespy_nicks(SOCKET clientsock, std::string& buffer)
 	if (userid == 0)
 	{
 		socket_send(clientsock, "\\nr\\0\\ndone\\final\\", 19); // Send ERROR if no id exists (wrong account/check?)
+		SAFE_DELETE(result);
 		return;
 	}
 
-	delete result; // Free first result query
-	//query[0] = '\0'; // Reset query array
-//	memset(query, '\0', sizeof(query));
+	SAFE_DELETE(result);
 
 	printf("= ID Found: %d\n", userid);
 
-	result = new ResultQuery(std::string("SELECT nickname, unique_nickname FROM nicks WHERE acc_id=" + std::to_string(userid)));
+	sprintf_s(query, sizeof(query), "SELECT nickname, unique_nickname FROM nicks WHERE acc_id = %d", userid);
 
-	if (!result->next())
+	result = new ResultQuery();
+
+	if (!result->next(query))
 	{
-		delete result;
+		SAFE_DELETE(result);
 		return;
 	}
-
-	memset(query, '\0', sizeof(query)); // Reset query array
 
 	if (result->getAffectedRows() < 1)
 	{
@@ -122,11 +122,11 @@ void gamespy_nicks(SOCKET clientsock, std::string& buffer)
 #endif
 		socket_send(clientsock, "\\nr\\0\\ndone\\final\\", 19); // No profile exists
 
-		delete result;
+		SAFE_DELETE(result);
 		return;
 	}
 
-	strcpy_s(query, QUERY_MAX_LEN, "\\nr\\1\\");
+	sprintf_s(temp, QUERY_MAX_LEN, "\\nr\\1\\");
 
 	do
 	{
@@ -136,25 +136,25 @@ void gamespy_nicks(SOCKET clientsock, std::string& buffer)
 #ifdef _DEBUG
 		printf("= Got %s and %s\n", nickname, uniquenick);
 #endif
-		strcat_s(query, QUERY_MAX_LEN, "nick\\");
-		strcat_s(query, QUERY_MAX_LEN, nickname);
-		strcat_s(query, QUERY_MAX_LEN, "\\uniquenick\\");
-		strcat_s(query, QUERY_MAX_LEN, uniquenick);
-		strcat_s(query, QUERY_MAX_LEN, "\\");
+		strcat_s(temp, QUERY_MAX_LEN, "nick\\");
+		strcat_s(temp, QUERY_MAX_LEN, nickname);
+		strcat_s(temp, QUERY_MAX_LEN, "\\uniquenick\\");
+		strcat_s(temp, QUERY_MAX_LEN, uniquenick);
+		strcat_s(temp, QUERY_MAX_LEN, "\\");
 
-		if (!result->next())
+		if (!result->next(query))
 			break; // End of usernames
 
 	} while (true);
 
-	delete result;
+	SAFE_DELETE(result);
 
-	strcat_s(query, QUERY_MAX_LEN, "ndone\\final\\"); // All done
+	strcat_s(temp, QUERY_MAX_LEN, "ndone\\final\\"); // All done
 
-	socket_send(clientsock, query, strlen(query) + 1);
+	socket_send(clientsock, temp, strlen(temp) + 1);
 }
 
-void gamespy_search(SOCKET clientsock, std::string& buffer)
+void gamespy_search(SOCKET, std::string)
 {
 #if 0
 	char sesskey[sizeof(int)];

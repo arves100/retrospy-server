@@ -1,9 +1,27 @@
 #include "Common.h"
 #include "Database.hpp"
 
-// ResultQuery Class
+// Shared code
+static sqlite3 *database_sqlite = 0;
 
-ResultQuery::ResultQuery(std::string query)
+static int database_exec_callback(void *, int argc, char **argv, char **azColName)
+{
+#ifdef _DEBUG
+	int i = 0;
+	printf("DATABASE_EXEC_CALLBACK: \n");
+	printf("\tArgc = %d\n", argc);
+	for (; i < argc; i++)
+	{
+		printf("\tArgv[%d] = %s\n", i, argv[i]);
+	}
+
+	printf("\tazColName[0] = %s\n", azColName[0]);
+#endif
+	return 0;
+}
+
+// ResultQuery Class
+ResultQuery::ResultQuery()
 {
 	nRows = -1;
 	nColumns = -1;
@@ -12,8 +30,6 @@ ResultQuery::ResultQuery(std::string query)
 	stmt = 0;
 
 	isClosed = true;
-
-	ResultQuery::query = query;
 }
 
 ResultQuery::~ResultQuery()
@@ -36,16 +52,16 @@ void ResultQuery::close()
 	nColumns = -1;
 }
 
-bool ResultQuery::exec()
+bool ResultQuery::exec(const char *query)
 {
 	int nTmp = 0;
 
-	if (query.length() < 1)
+	if (strlen(query) < 1)
 		return false;
 
 	if (!stmt)
 	{
-		if (!database_prepare(query.c_str(), query.length() + 1, &stmt, 0))
+		if (!database_prepare(query, strlen(query) + 1, &stmt, 0))
 			return false;
 
 		isClosed = false;
@@ -90,15 +106,16 @@ void ResultQuery::vector_free()
 	{
 		if (values.at(nTmp))
 			sqlite3_value_free(values.at(nTmp));
+		values.at(nTmp) = 0;
 	}
 
 	values.clear();
 }
 
-bool ResultQuery::next()
+bool ResultQuery::next(const char *query)
 {
 	vector_free();
-	return exec();
+	return exec(query);
 }
 
 sqlite3_value *ResultQuery::get(unsigned int columnIndex)
@@ -126,18 +143,15 @@ sqlite3_value *ResultQuery::get(unsigned int columnIndex)
 
 // Normal Database API
 
-sqlite3 *database_sqlite = 0;
-
-static int database_exec_callback(void *unused, int argc, char **argv, char **azColName)
-{
-	return 0;
-}
-
 int database_prepare(const char *sql, int sql_length, sqlite3_stmt **ppStmt, const char **pzTail)
 {
 	int result = 0;
 
-	result = sqlite3_prepare_v2(database_sqlite, sql, sql_length, ppStmt, pzTail);
+
+	if (!database_sqlite)
+		return 0;
+
+	result = sqlite3_prepare(database_sqlite, sql, sql_length, ppStmt, pzTail);
 	if (result != SQLITE_OK)
 	{
 #ifdef _DEBUG
@@ -160,7 +174,9 @@ int database_step(sqlite3_stmt *stmt)
 int database_open(const char *name)
 {
 	int rc = 0;
-	char *zErrMsg = 0;
+
+	if (database_sqlite)
+		database_close();
 
 	rc = sqlite3_open(name, &database_sqlite);
 	if (rc)
@@ -182,7 +198,9 @@ void database_finalize(sqlite3_stmt *stmt)
 
 void database_close()
 {
-	sqlite3_close(database_sqlite);
+	if (database_sqlite)
+		sqlite3_close(database_sqlite);
+	database_sqlite = 0;
 }
 
 int database_exec(const char *query)
@@ -195,16 +213,17 @@ int database_exec(const char *query)
 	{
 #ifdef _DEBUG
 		printf("Error in database_exec: SQL error: %s\n", zErrMsg);
-		sqlite3_free(zErrMsg);
+		SAFE_SQLITE_FREE(zErrMsg);
 		return 0;
 #endif
 	}
 
-//	sqlite3_free(zErrMsg);
+	SAFE_SQLITE_FREE(zErrMsg);
 	return 1;
 }
 
-int database_exec_count_from_select(std::string &query, int *nOut)
+
+int database_exec_count_from_select(std::string query, int *nOut)
 {
 	std::string qr2 = query;
 

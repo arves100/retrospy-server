@@ -9,10 +9,10 @@
 class ResultQuery
 {
 public:
-	ResultQuery(std::string query);
+	ResultQuery();
 	~ResultQuery();
 
-	bool next();
+	bool next(const char *query);
 
 	bool isFirst() { return nCurrRow == 1 ? true : false; }
 	bool isLast() { return nCurrRow == nRows ? true : false; }
@@ -32,8 +32,6 @@ public:
 
 	int getAffectedColumns() { return nColumns; }
 	int getAffectedRows() { return nRows; }
-
-	std::string getQuery() { return query; }
 private:
 	int nRows;
 	int nColumns;
@@ -42,17 +40,16 @@ private:
 	std::vector<sqlite3_value *> values;
 	bool isClosed;
 
-	std::string query;
 	sqlite3_stmt *stmt;
 
 	void vector_free();
-	bool exec();
+	bool exec(const char *query);
 
 	sqlite3_value *get(unsigned int columnIndex);
 };
 
 extern int database_exec_count(const char *query, int *nOut);
-extern int database_exec_count_from_select(std::string &query, int *nOut);
+extern int database_exec_count_from_select(std::string query, int *nOut);
 
 extern int database_is_column_null(sqlite3_stmt *stmt, int column);
 
